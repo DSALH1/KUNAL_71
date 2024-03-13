@@ -201,9 +201,9 @@ public:
             temp = s1.top();
             s1.pop();
             s2.push(temp);
-            if (temp->right != NULL)
-                s1.push(temp->right);
             if (temp->left != NULL)
+                s1.push(temp->right);
+            if (temp->right != NULL)
                 s1.push(temp->left);
         }
         while (!s2.empty())
@@ -260,6 +260,7 @@ public:
     int internalNodeItr()
     {
         queue<Node *> q;
+        queue<Node *> res;
         q.push(root);
         while (!q.empty())
         {
@@ -278,10 +279,10 @@ public:
             }
             if (isInternal)
             {
-                return q.size() + 1;
+                res.push(temp);
             }
         }
-        return 0;
+        return res.size();
     }
     void swapLeftRight(Node *root)
     {
