@@ -97,6 +97,7 @@ int main()
     h.insert("Kunal", 1234);
     h.insert("abcd", 1236);
     h.insert("ghjl", 1239);
-    cout << h.Search(1234);
+    h.insert("noob", 1244);
+    cout << h.Search(1244);
     return 0;
 }
