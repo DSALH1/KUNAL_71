@@ -62,7 +62,7 @@ public:
         int h = HashFunc(ph_no);
         while (table[h] != NULL)
         {
-            if (table[h]->ph_no != ph_no)
+            if (table[h]->ph_no == ph_no)
             {
                 break;
             }
@@ -98,6 +98,8 @@ int main()
     h.insert("abcd", 1236);
     h.insert("ghjl", 1239);
     h.insert("noob", 1244);
-    cout << h.Search(1244);
+    cout << h.Search(1244)<<endl;
+    // h.remove(1236);
+    cout << h.Search(1236)<<endl;
     return 0;
 }

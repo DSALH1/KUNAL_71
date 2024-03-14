@@ -44,10 +44,10 @@ public:
     void deleteKey(int key )
     {
         int k=key%10;
-        Node* temp=a[k];
+        Node* temp=arr[k];
         if(temp->key==key)
         {
-            a[k]=temp->next;
+            arr[k]=temp->next;
             delete temp;
             return;
         }
