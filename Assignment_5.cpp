@@ -41,6 +41,21 @@ public:
         }
         temp->next = new Node(k, data);
     }
+    void deleteKey(int key )
+    {
+        int k=key%10;
+        Node* temp=a[k];
+        if(temp->key==key)
+        {
+            a[k]=temp->next;
+            delete temp;
+            return;
+        }
+        while(temp->next->key!=key) temp=temp->next;
+        Node* delNode=temp->next;
+        temp->next=temp->next->next;
+        delete delNode;
+    }
 
     void display()
     {
