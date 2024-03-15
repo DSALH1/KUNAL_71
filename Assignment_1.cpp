@@ -202,9 +202,9 @@ public:
             s1.pop();
             s2.push(temp);
             if (temp->left != NULL)
-                s1.push(temp->right);
-            if (temp->right != NULL)
                 s1.push(temp->left);
+            if (temp->right != NULL)
+                s1.push(temp->right);
         }
         while (!s2.empty())
         {
