@@ -253,7 +253,7 @@ int main()
         }
         else if (c == 5)
         {
-            cout << "Wrong Choice" << endl;
+           break;
         }
     }
     return 0;
