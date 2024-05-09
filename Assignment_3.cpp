@@ -1,238 +1,323 @@
+// 0) Create an inordered threaded binary search tree for integer. Perform inorder traversal,
+// and deletion of a node.
+// Note: Display lbit, rbit for every node
+
 #include <iostream>
 using namespace std;
 
-// Class of the Node
 class Node
 {
-    int lbit, rbit;
-    int value;
-    Node *left, *right;
-
 public:
-    // Constructor of the
-    // Node of the Tree
-    Node(int value)
+    int data;
+    Node *left;
+    Node *right;
+    int rbit;
+    int lbit;
+
+    Node(int d)
     {
-        lbit = rbit = 0;
-        this->value = value;
-        left = right = NULL;
+        this->data = d;
+        this->left = NULL;
+        this->right = NULL;
+        this->rbit = 0;
+        this->lbit = 0;
     }
-    friend class DTBT;
+
+    friend class TBST;
 };
 
-// Class of the Threaded
-// Binary search tree
-class DTBT
+class TBST
 {
-    Node *root;
-
 public:
-    // Constructor of the
-    // Threaded of the Binary
-    // Search Tree
-    DTBT()
+    Node *root, *head;
+
+    TBST()
     {
-        root = new Node(9999);
-
-        // Initialise the dummy node
-        // to any random value of
-        // your choice.
-
-        // Considering our whole
-        // tree is at left of
-        // dummy node
-        root->rbit = 1;
-        root->lbit = 0;
-
-        // Consider your whole tree
-        // lies to the left of
-        // this dummy node.
-        root->left = root;
-        root->right = root;
+        root = NULL;
+        head = NULL;
     }
-    void create();
-    void insert(int value);
-    void preorder();
-    Node *preorderSuccessor(Node *);
-    void inorder();
-    Node *inorderSuccessor(Node *);
+
+    Node *get_root()
+    {
+        return root;
+    }
+
+    void insert(int x)
+    {
+        if (root == NULL)
+        {
+            head = new Node(999);
+            head->right = head;
+            root = new Node(x);
+            head->left = root;
+            head->lbit = 1;
+            root->left = head;
+            root->right = head;
+            return;
+        }
+        else
+        {
+            Node *p = root;
+            Node *q = new Node(x);
+
+            while (true)
+            {
+                if (x == p->data)
+                {
+                    delete q;
+                    return;
+                }
+                else if (x < p->data)
+                {
+                    if (p->lbit == 1)
+                    {
+                        p = p->left;
+                    }
+                    else
+                    {
+                        q->left = p->left;
+                        q->right = p;
+                        p->left = q;
+                        p->lbit = 1;
+                        return;
+                    }
+                }
+                else
+                {
+                    if (p->rbit == 1)
+                    {
+                        p = p->right;
+                    }
+                    else
+                    {
+                        q->right = p->right;
+                        q->left = p;
+                        p->right = q;
+                        p->rbit = 1;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    void Inorder()
+    {
+        Node *p = root;
+
+        while (p->lbit == 1)
+        {
+            p = p->left;
+        }
+        while (p != head)
+        {
+            cout << p->data << " " << endl;
+            cout << "The lbit of " << p->data << " is : " << p->lbit << endl;
+            cout << "The rbit of " << p->data << " is : " << p->rbit << endl;
+
+            if (p->rbit == 1)
+            {
+                p = p->right;
+                while (p->lbit == 1)
+                {
+                    p = p->left;
+                }
+            }
+
+            else
+            {
+                p = p->right;
+            }
+        }
+        cout << endl;
+    }
+
+    void preoOrder()
+    {
+        Node *p = root;
+        int flag;
+
+        while (p != head)
+        {
+            if (flag == 0)
+            {
+                cout << p->data << " ";
+            }
+
+            if (flag == 0 && p->lbit == 1)
+            {
+                p = p->left;
+            }
+            else
+            {
+                if (p->rbit == 1)
+                {
+                    flag = 0;
+                }
+                else
+                {
+                    flag = 1;
+                }
+                p = p->right;
+            }
+        }
+    }
+
+    Node *InOrderSuccessor(Node *root)
+    {
+        if (root == NULL)
+        {
+            return NULL;
+        }
+
+        if (root->rbit == 0)
+        {
+            return root->right;
+        }
+
+        root = root->right;
+        while (root->lbit == 1)
+        {
+            root = root->left;
+        }
+
+        return root;
+    }
+
+    Node *deletionNode(Node *&root, int key)
+    {
+        if (root == NULL)
+        {
+            return root;
+        }
+
+        Node *p = NULL;
+        Node *curr = root;
+
+        // Search for the node to be deleted
+        while (curr && curr->data != key)
+        {
+            p = curr;
+
+            if (key < curr->data)
+            {
+                if (curr->lbit == 1)
+                {
+                    curr = curr->left;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                if (curr->rbit == 1)
+                {
+                    curr = curr->right;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        if (curr == NULL)
+        {
+            return root; // Node not found, return unchanged tree
+        }
+
+        Node *child;
+        if (curr->lbit == 0 || curr->rbit == 0)
+        {
+            // Node has at most one child
+            if (curr->lbit == 0 && curr->rbit == 1)
+            {
+                child = curr->right;
+            }
+            else if (curr->rbit == 0 && curr->lbit == 1)
+            {
+                child = curr->left;
+            }
+            else
+            {
+                if (curr == p->left)
+                {
+                    p->lbit = 0;
+                    p->left = curr->left;
+                }
+                else
+                {
+                    p->rbit = 0;
+                    p->right = curr->right;
+                }
+
+                return p;
+            }
+
+            if (p == NULL)
+            {
+                return child; // Node to delete is root
+            }
+            if (curr == p->left)
+            {
+                p->left = child;
+                if (child)
+                {
+                    p->lbit = 1;
+                }
+                else
+                {
+                    p->lbit = 0;
+                }
+                // p->lbit = (child == NULL) ? 0 : 1; // Update threaded link
+            }
+            else
+            {
+                p->right = child;
+                if (child)
+                {
+                    p->rbit = 1;
+                }
+                else
+                {
+                    p->rbit = 0;
+                }
+                // p->rbit = (child == NULL) ? 0 : 1; // Update threaded link
+            }
+
+            delete curr;
+        }
+        else
+        {
+            // Node has both children
+            Node *s = InOrderSuccessor(curr); // Find in-order successor
+            int temp = s->data;               // Swap data with successor
+            deletionNode(root, temp);         // Delete successor node
+            curr->data = temp;                // Replace data with successor's data
+        }
+
+        return root;
+    }
 };
 
-// Function to create the Binary
-// search tree
-void DTBT::create()
-{
-    int n = 9;
-
-    // Insertion of the nodes
-    this->insert(6);
-    this->insert(3);
-    this->insert(1);
-    this->insert(5);
-    this->insert(8);
-    this->insert(7);
-    this->insert(11);
-    this->insert(9);
-    this->insert(13);
-}
-
-// Function to insert the nodes
-// into the threaded binary
-// search tree
-void DTBT::insert(int data)
-{
-    // Condition to check if there
-    // is no node in the binary tree
-    if (root->left == root && root->right == root)
-    {
-
-        Node *p = new Node(data);
-        p->left = root->left;
-        p->lbit = root->lbit;
-        p->rbit = 0;
-        p->right = root->right;
-
-        // Inserting the node in the
-        // left of the dummy node
-        root->left = p;
-        root->lbit = 1;
-        return;
-    }
-
-    // New node
-    Node *cur = new Node(data);
-    cur = root->left;
-    while (1)
-    {
-        // Condition to check if the
-        // data to be inserted is
-        // less than the current node
-        if (cur->value < data)
-        {
-            Node *p = new Node(data);
-            if (cur->rbit == 0)
-            {
-                p->right = cur->right;
-                p->rbit = cur->rbit;
-                p->lbit = 0;
-                p->left = cur;
-
-                // Inserting the node
-                // in the right
-                cur->rbit = 1;
-                cur->right = p;
-                return;
-            }
-            else
-                cur = cur->right;
-        }
-
-        // Otherwise insert the node
-        // in the left of current node
-        if (cur->value > data)
-        {
-            Node *p = new Node(data);
-            p->value = data;
-            if (cur->lbit == 0)
-            {
-                p->left = cur->left;
-                p->lbit = cur->lbit;
-                p->rbit = 0;
-
-                // Pointing the right child
-                // to its inorder Successor
-                p->right = cur;
-                cur->lbit = 1;
-                cur->left = p;
-                return;
-            }
-            else
-                cur = cur->left;
-        }
-    }
-}
-
-// In Threaded binary search tree
-// the left pointer of every node
-// points to its Inorder predecessor,
-// whereas its right pointer points
-// to the Inorder Successor
-void DTBT::preorder()
-{
-    Node *c = root->left;
-
-    // Loop to traverse the tree in
-    // the preorder fashion
-    while (c != root)
-    {
-        cout << " " << c->value;
-        c = preorderSuccessor(c);
-    }
-}
-
-// Function to find the preorder
-// Successor of the node
-Node *DTBT::preorderSuccessor(Node *c)
-{
-    if (c->lbit == 1)
-    {
-        return c->left;
-    }
-    while (c->rbit == 0)
-    {
-        c = c->right;
-    }
-    return c->right;
-}
-
-// In Threaded binary search tree
-// the left pointer of every node
-// points to its Inorder predecessor
-// whereas its right pointer points
-// to the Inorder Successor
-void DTBT::inorder()
-{
-    Node *c;
-    c = root->left;
-    while (c->lbit == 1)
-        c = c->left;
-
-    // Loop to traverse the tree
-    while (c != root)
-    {
-        cout << " " << c->value;
-        c = inorderSuccessor(c);
-    }
-}
-
-// Function to find the inorder
-// successor of the node
-Node *DTBT::inorderSuccessor(Node *c)
-{
-    if (c->rbit == 0)
-        return c->right;
-    else
-        c = c->right;
-    while (c->lbit == 1)
-    {
-        c = c->left;
-    }
-    return c;
-}
-
-// Driver Code
 int main()
 {
-    DTBT t1;
 
-    // Creation of the Threaded
-    // Binary search tree
-    t1.create();
+    TBST tree;
 
-    cout << "Inorder Traversal of DTBST\n";
-    t1.inorder();
+    tree.insert(15);
+    tree.insert(11);
+    tree.insert(17);
+    tree.insert(10);
+    tree.insert(14);
+    tree.insert(16);
+    tree.insert(18);
+    tree.Inorder();
 
-    cout << "\nPreorder Traversal of DTBST\n";
-    t1.preorder();
+    tree.root = tree.deletionNode(tree.root, 15);
+    tree.Inorder();
+
     return 0;
 }
