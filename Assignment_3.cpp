@@ -132,35 +132,40 @@ public:
         cout << endl;
     }
 
-    void preoOrder()
+   void preorder()
     {
-        Node *p = root;
-        int flag;
-
-        while (p != head)
+        if(root == NULL)
         {
-            if (flag == 0)
-            {
-                cout << p->data << " ";
-            }
-
-            if (flag == 0 && p->lbit == 1)
-            {
-                p = p->left;
-            }
-            else
-            {
-                if (p->rbit == 1)
-                {
-                    flag = 0;
-                }
-                else
-                {
-                    flag = 1;
-                }
-                p = p->right;
-            }
+            cout<<"Tree is empty"<<endl;
+            return;
         }
+        Node* p = root;
+        while(p!=head)
+        {
+           cout<<p->data<<endl;
+           cout<<"lbit: "<<p->lbit<<endl;
+           cout<<"rbit: "<<p->rbit<<endl;
+           if(p->lbit == 1)
+           {
+              p = p->left;
+           }
+           else if(p->rbit == 1)
+           {
+              p = p->right;
+           }
+           else
+           {
+              while(p != NULL and p->rbit == 0)
+              {
+                 p=this->inoderSuccesor(p);
+              }
+              if(p != NULL)
+              {
+                 p = p->right;
+              }
+           }
+        }
+        return;
     }
 
     Node *InOrderSuccessor(Node *root)
