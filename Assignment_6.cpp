@@ -1,106 +1,117 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-class Node
+class Graph
 {
+private:
+    vector<vector<int>> adjList;
+
 public:
-    int data;
-    Node *next;
-    Node(int d)
+    Graph(int size)
     {
-        data = d;
-        next = NULL;
+        adjList.resize(size);
     }
-};
 
-void dfs(int v, vector<bool> &visited, Node *a[])
-{
-    visited[v] = true;
-    cout << v << "  ";
-
-    Node *t = a[v]->next;
-    while (t->next)
+    void adjustancyList(int u, int v)
     {
-        if (!visited[t->data])
-            dfs(t->data, visited, a);
-        t = t->next;
+        adjList[u].push_back(v);
+        adjList[v].push_back(u);
     }
-}
 
-void bfs(int v, Node *a[], int n)
-{
-    vector<bool> visited(n, false);
-    queue<int> q;
-    visited[v] = true;
-    q.push(v);
-
-    while (!q.empty())
+    void BFS_traversal(int vertex)
     {
-        v = q.front();
-        q.pop();
-        cout << v << "  ";
+        vector<int> visited(adjList.size(), 0);
+        queue<int> q;
+        visited[vertex] = 1;
 
-        Node *t = a[v]->next;
-        while (t->next)
+        q.push(vertex);
+
+        while (!q.empty())
         {
-            if (!visited[t->data])
+            int node = q.front(); //// SPACE COMPLEXITY -->> 1 queue 1 visited array and 1 vector for storing ans so O(3N)
+            q.pop();              ////  TIME COMPLEXITY ->> O(N)           +      O(E)
+            cout << node << " ";  //   |                     |
+                                  //  size of queue     number of degree of each vertices
+            for (auto it : adjList[node])
             {
-                visited[t->data] = true;
-                q.push(t->data);
+                if (visited[it] == 0)
+                {
+                    visited[it] = 1;
+                    q.push(it);
+                }
             }
-            t = t->next;
-        }
-    }
-}
-
-void printadj(Node *a[], int n)
-{
-    for (int i = 1; i <= n; i++)
-    {
-        Node *temp = a[i]->next;
-        cout << i << "-->";
-        while (temp)
-        {
-            cout << temp->data << "  ";
-            temp = temp->next;
         }
         cout << endl;
     }
-}
 
-void adjList(Node *a[], int n)
-{
-    for (int i = 0; i <= n; i++)
-        a[i] = new Node(-1);
-
-    for (int i = 1; i <= n; i++)
+    void DFS_helper(int vertex, vector<int> &visited)
     {
-        Node *head = a[i];
-        cout << "\nEnter nodes joined with " << i << "=\n";
-        int data;
-        do
+        visited[vertex] = true;
+        cout << vertex << " ";
+
+        for (auto it : adjList[vertex])
         {
-            cout << "Enter data=";
-            cin >> data;
-            head->next = new Node(data);
-            head = head->next;
-        } while (data != -1);
+            if (visited[it] == 0)
+            {
+                DFS_helper(it, visited);
+            }
+        }
     }
 
-    printadj(a, n);
-}
+    void DFS_traversal(int vertex)
+    {
+        vector<int> visited(adjList.size(), 0); ////  SPACE complexity O(N);
+        DFS_helper(vertex, visited);            ///   Time Complexity  O(N) + O(2xE);
+        cout << endl;
+    }
+
+    void DFS_Non_Recursive(int vertex)
+    {
+        vector<int> visited(adjList.size(), 0);
+        stack<int> st;
+
+        st.push(vertex);
+
+        while (!st.empty())
+        {
+            int node = st.top();
+            st.pop();
+
+            // if (visited[node] == 0) {
+            visited[node] = 1;
+            cout << node << " ";
+
+            for (auto it : adjList[node])
+            {
+                if (visited[it] == 0)
+                {
+                    st.push(it);
+                }
+            }
+            // }
+        }
+        cout << endl;
+    }
+};
 
 int main()
 {
-    int n;
-    cout << "Enter number of nodes=";
-    cin >> n;
-    Node *a[n + 1];
-    adjList(a, n);
 
-    vector<bool> visited(n + 1, false);
-    dfs(1, visited, a);
-    cout << endl;
-    bfs(1, a, n);
+    Graph g(8);
+
+    g.adjustancyList(1, 2);
+    g.adjustancyList(2, 3);
+    g.adjustancyList(3, 4);
+    g.adjustancyList(4, 5);
+    g.adjustancyList(5, 6);
+    g.adjustancyList(6, 7);
+
+    cout << "BFS Traversal:" << endl;
+    g.BFS_traversal(5);
+    cout << "DFS Traversal:" << endl;
+    g.DFS_traversal(4);
+    cout << "DFS Non-recursive:" << endl;
+    g.DFS_Non_Recursive(3);
+
     return 0;
 }
